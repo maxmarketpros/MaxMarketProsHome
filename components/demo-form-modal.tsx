@@ -6,6 +6,17 @@ import { useState } from "react"
 import { X, ArrowRight, ArrowLeft, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+const createInitialFormData = () => ({
+  businessName: "",
+  businessType: "",
+  website: "",
+  services: [] as string[],
+  fullName: "",
+  email: "",
+  phone: "",
+  message: "",
+})
+
 interface DemoFormModalProps {
   isOpen: boolean
   onClose: () => void
@@ -13,16 +24,9 @@ interface DemoFormModalProps {
 
 export function DemoFormModal({ isOpen, onClose }: DemoFormModalProps) {
   const [step, setStep] = useState(1)
-  const [formData, setFormData] = useState({
-    businessName: "",
-    businessType: "",
-    website: "",
-    services: [] as string[],
-    fullName: "",
-    email: "",
-    phone: "",
-    message: "",
-  })
+  const [formData, setFormData] = useState(createInitialFormData)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null)
 
   const totalSteps = 3
 
@@ -36,10 +40,12 @@ export function DemoFormModal({ isOpen, onClose }: DemoFormModalProps) {
   ]
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    if (submitStatus) setSubmitStatus(null)
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
   const handleServiceToggle = (service: string) => {
+    if (submitStatus) setSubmitStatus(null)
     setFormData({
       ...formData,
       services: formData.services.includes(service)
@@ -49,17 +55,50 @@ export function DemoFormModal({ isOpen, onClose }: DemoFormModalProps) {
   }
 
   const handleNext = () => {
+    if (submitStatus) setSubmitStatus(null)
     if (step < totalSteps) setStep(step + 1)
   }
 
   const handleBack = () => {
+    if (submitStatus) setSubmitStatus(null)
     if (step > 1) setStep(step - 1)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // Form will be handled by Netlify
-    console.log("Form submitted:", formData)
+    setIsSubmitting(true)
+    setSubmitStatus(null)
+
+    const payload = new URLSearchParams({
+      "form-name": "demo-request",
+      "bot-field": "",
+      businessName: formData.businessName,
+      businessType: formData.businessType,
+      website: formData.website,
+      services: formData.services.join(", "),
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      message: formData.message,
+    })
+
+    try {
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: payload.toString(),
+      })
+
+      if (!response.ok) throw new Error("Form submission failed")
+
+      setSubmitStatus("success")
+      setFormData(createInitialFormData())
+      setStep(totalSteps)
+    } catch (error) {
+      setSubmitStatus("error")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (!isOpen) return null
@@ -269,6 +308,23 @@ export function DemoFormModal({ isOpen, onClose }: DemoFormModalProps) {
             </div>
           )}
 
+          {submitStatus === "success" && (
+            <div
+              className="mt-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+              role="status"
+            >
+              Thanks! We'll be in touch within one business day.
+            </div>
+          )}
+          {submitStatus === "error" && (
+            <div
+              className="mt-6 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+              role="alert"
+            >
+              Something went wrong. Please try again or reach out directly.
+            </div>
+          )}
+
           {/* Navigation Buttons */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
             <div className="text-sm text-muted-foreground">
@@ -276,7 +332,13 @@ export function DemoFormModal({ isOpen, onClose }: DemoFormModalProps) {
             </div>
             <div className="flex gap-3">
               {step > 1 && (
-                <Button type="button" onClick={handleBack} variant="outline" className="gap-2 bg-transparent">
+                <Button
+                  type="button"
+                  onClick={handleBack}
+                  variant="outline"
+                  className="gap-2 bg-transparent"
+                  disabled={isSubmitting}
+                >
                   <ArrowLeft className="w-4 h-4" />
                   Back
                 </Button>
@@ -287,7 +349,7 @@ export function DemoFormModal({ isOpen, onClose }: DemoFormModalProps) {
                   onClick={handleNext}
                   className="gap-2"
                   disabled={
-                    (step === 1 && (!formData.businessName || !formData.businessType)) ||
+                    isSubmitting || (step === 1 && (!formData.businessName || !formData.businessType)) ||
                     (step === 2 && formData.services.length === 0)
                   }
                 >
@@ -298,9 +360,9 @@ export function DemoFormModal({ isOpen, onClose }: DemoFormModalProps) {
                 <Button
                   type="submit"
                   className="gap-2 bg-primary hover:bg-primary/90"
-                  disabled={!formData.fullName || !formData.email || !formData.phone}
+                  disabled={isSubmitting || !formData.fullName || !formData.email || !formData.phone}
                 >
-                  Submit Request
+                  {isSubmitting ? "Submitting..." : "Submit Request"}
                   <Check className="w-4 h-4" />
                 </Button>
               )}

@@ -16,6 +16,25 @@ import { ContactSection } from "@/components/pro-blocks/landing-page/contact-sec
 export default function Page() {
   return (
     <main>
+      <form
+        name="demo-request"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        hidden
+        aria-hidden="true"
+      >
+        <input type="hidden" name="form-name" value="demo-request" />
+        <input type="hidden" name="bot-field" />
+        <input type="text" name="businessName" />
+        <input type="text" name="businessType" />
+        <input type="url" name="website" />
+        <input type="text" name="services" />
+        <input type="text" name="fullName" />
+        <input type="email" name="email" />
+        <input type="tel" name="phone" />
+        <textarea name="message" defaultValue="" />
+      </form>
       <div className="hidden">
         <LpNavbar1 />
       </div>
