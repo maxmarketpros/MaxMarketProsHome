@@ -28,3 +28,14 @@ Continue building your app on:
 2. Deploy your chats from the v0 interface
 3. Changes are automatically pushed to this repository
 4. Vercel deploys the latest version from this repository
+
+## Netlify Deployment
+
+To deploy on Netlify with the included configuration:
+
+1. Push this repository to a Git provider (GitHub, GitLab, or Bitbucket).
+2. In Netlify, create a new site from Git and choose this repository.
+3. Netlify reads `netlify.toml`, installs pnpm automatically, and runs `pnpm build` to publish the `.next` directory.
+4. Trigger a deploy from the main branch; later pushes build automatically.
+
+The included `@netlify/plugin-nextjs` dependency enables full Next.js 14 features (app router, middleware, image optimization) on Netlify.
