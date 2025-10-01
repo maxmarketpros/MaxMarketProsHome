@@ -19,6 +19,7 @@ export default function Page() {
       <form
         name="demo-request"
         method="POST"
+        action="/"
         data-netlify="true"
         netlify-honeypot="bot-field"
         hidden

@@ -135,6 +135,7 @@ export function DemoFormModal({ isOpen, onClose }: DemoFormModalProps) {
         <form
           name="demo-request"
           method="POST"
+          action="/"
           data-netlify="true"
           netlify-honeypot="bot-field"
           onSubmit={handleSubmit}

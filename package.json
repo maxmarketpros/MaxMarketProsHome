@@ -69,8 +69,7 @@
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
-    "typescript": "^5",
-    "@netlify/plugin-nextjs": "^5.13.4"
+    "typescript": "^5"
   },
   "packageManager": "pnpm@9.12.1"
 }
