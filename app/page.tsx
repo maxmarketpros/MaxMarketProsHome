@@ -16,7 +16,9 @@ import { ContactSection } from "@/components/pro-blocks/landing-page/contact-sec
 export default function Page() {
   return (
     <main>
-      <LpNavbar1 />
+      <div className="hidden">
+        <LpNavbar1 />
+      </div>
       <HeroSection2 />
       <LogoSection10 />
       <section id="services">
